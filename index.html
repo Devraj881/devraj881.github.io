@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ghost Calculator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Calculator Screen -->
+<div id="calculator">
+  <div id="display">0</div>
+  <div id="buttons">
+    <button onclick="press('7')">7</button>
+    <button onclick="press('8')">8</button>
+    <button onclick="press('9')">9</button>
+    <button onclick="press('C')">C</button>
+    <button onclick="press('4')">4</button>
+    <button onclick="press('5')">5</button>
+    <button onclick="press('6')">6</button>
+    <button onclick="press('+')">+</button>
+    <button onclick="press('1')">1</button>
+    <button onclick="press('2')">2</button>
+    <button onclick="press('3')">3</button>
+    <button onclick="press('-')">-</button>
+    <button onclick="press('0')">0</button>
+    <button onclick="press('.')">.</button>
+    <button onclick="press('=')">=</button>
+    <button onclick="press('*')">*</button>
+  </div>
+</div>
+
+<!-- Hidden Chat -->
+<div id="chatSection">
+  <h2>👻 GhostChat</h2>
+  <div id="chatBox"></div>
+  <input id="msgInput" placeholder="Type your secret message..." />
+  <button class="chatBtn" onclick="sendMsg()">Send</button>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
