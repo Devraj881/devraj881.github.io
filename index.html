@@ -1,45 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Ghost Calculator</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>GhostChat</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-<!-- Calculator UI -->
-<div id="calculator">
-  <div id="display">0</div>
-  <div id="buttons">
-    <button onclick="press('7')">7</button>
-    <button onclick="press('8')">8</button>
-    <button onclick="press('9')">9</button>
-    <button onclick="press('C')">C</button>
-    <button onclick="press('4')">4</button>
-    <button onclick="press('5')">5</button>
-    <button onclick="press('6')">6</button>
-    <button onclick="press('+')">+</button>
-    <button onclick="press('1')">1</button>
-    <button onclick="press('2')">2</button>
-    <button onclick="press('3')">3</button>
-    <button onclick="press('-')">-</button>
-    <button onclick="press('0')">0</button>
-    <button onclick="press('.')">.</button>
-    <button onclick="press('=')">=</button>
-    <button onclick="press('*')">*</button>
+  <!-- Calculator Unlock -->
+  <div id="calculator">
+    <div id="display">0</div>
+    <div id="buttons">
+      <button onclick="press('7')">7</button>
+      <button onclick="press('8')">8</button>
+      <button onclick="press('9')">9</button>
+      <button onclick="press('C')">C</button>
+      <button onclick="press('4')">4</button>
+      <button onclick="press('5')">5</button>
+      <button onclick="press('6')">6</button>
+      <button onclick="press('+')">+</button>
+      <button onclick="press('1')">1</button>
+      <button onclick="press('2')">2</button>
+      <button onclick="press('3')">3</button>
+      <button onclick="press('-')">-</button>
+      <button onclick="press('0')">0</button>
+      <button onclick="press('.')">.</button>
+      <button onclick="press('=')">=</button>
+      <button onclick="press('*')">*</button>
+    </div>
   </div>
-</div>
 
-<!-- Hidden Chat -->
-<div id="chatSection">
-  <h2>👻 GhostChat</h2>
-  <div id="chatBox"></div>
-  <input id="msgInput" placeholder="Type your secret message..." />
-  <button class="chatBtn" onclick="sendMsg()">Send</button>
-</div>
+  <!-- Chat Section -->
+  <div id="chatSection" style="display:none;">
+    <h2>👻 GhostChat</h2>
+    <div id="userCount"></div>
+    <div id="replyBox" style="display:none;">
+      <span id="replyToText"></span>
+      <button onclick="cancelReply()" style="margin-left: 10px;">Cancel</button>
+    </div>
+    <div id="chatBox"></div>
+    <div id="typingStatus"></div>
 
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-<script src="script.js"></script>
+    <input id="msgInput" placeholder="Type your secret message..." oninput="setTyping(true)" onblur="setTyping(false)" />
+    <input type="file" id="mediaInput" accept="image/*,video/*" onchange="handleFileUpload(this)" hidden />
+    <div style="display:flex; gap:5px; margin-top:5px;">
+      <button class="chatBtn" onclick="sendMsg()">Send</button>
+      <button class="chatBtn" onclick="document.getElementById('mediaInput').click()">📷 Media</button>
+    </div>
+  </div>
+<a href="whatsnew.html" id="whatsNewBtn" style="display: none;">ℹ What's New?</a>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

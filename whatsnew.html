@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What's New – GhostChat</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #111;
+      color: #f1f1f1;
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #444;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      color: #4caf50;
+    }
+
+    .version {
+      font-size: 14px;
+      color: #999;
+    }
+
+    .updates ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .updates li {
+      background: #1a1a1a;
+      margin: 10px 0;
+      padding: 12px 16px;
+      border-left: 4px solid #4caf50;
+      border-radius: 6px;
+    }
+
+    .updates li::before {
+      content: "✨ ";
+      margin-right: 5px;
+    }
+
+    .backBtn {
+      display: inline-block;
+      margin-top: 30px;
+      background: #4caf50;
+      color: #fff;
+      padding: 10px 16px;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    .backBtn:hover {
+      background: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>What's New</h1>
+    <div class="version">Version v2.3.0</div>
+  </div>
+
+  <div class="updates">
+    <ul>
+      <li>Swipe to reply like Instagram/WhatsApp 💬</li>
+      <li>Image & video sharing support 🖼️🎥</li>
+      <li>Live typing status + online users 👤</li>
+      <li>System messages: user joined/left the chat ⚠️</li>
+      <li>Message auto-deletes after 10 minutes 🕒</li>
+      <li>Tap to delete messages for everyone 🗑️</li>
+      <li>Clean calculator unlock UI 🔢</li>
+      <li>Improved user detection & online status ✅</li>
+    </ul>
+  </div>
+
+  <a class="backBtn" href="index.html">← Back to GhostChat</a>
+
+</body>
+</html>

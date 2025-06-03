@@ -31,6 +31,7 @@ body {
   border-radius: 8px;
   text-align: right;
   min-width: 220px;
+  user-select: none;
 }
 
 #buttons {
@@ -56,13 +57,13 @@ button:hover {
 }
 
 #chatSection {
-  display: none;
   flex-direction: column;
   gap: 10px;
   margin-top: 20px;
   width: 90%;
   max-width: 400px;
   text-align: left;
+  display: flex;
 }
 
 #chatBox {
@@ -72,12 +73,14 @@ button:hover {
   padding: 10px;
   border-radius: 10px;
   font-size: 14px;
+  word-wrap: break-word;
 }
 
 #chatBox .msg {
   margin-bottom: 10px;
   padding: 5px 10px;
   border-radius: 6px;
+  position: relative;
 }
 
 .msg.you {
@@ -91,6 +94,28 @@ button:hover {
   color: #fff;
 }
 
+.msg.system {
+  background: #444;
+  color: #ccc;
+  text-align: center;
+  font-style: italic;
+}
+
+.msg img, .msg video {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-top: 5px;
+}
+
+.replyBox {
+  background: #333;
+  color: #0ff;
+  padding: 4px 6px;
+  font-size: 12px;
+  border-radius: 4px;
+  margin-bottom: 5px;
+}
+
 #msgInput {
   padding: 10px;
   font-size: 16px;
@@ -99,6 +124,7 @@ button:hover {
   background: #222;
   color: white;
   width: 100%;
+  outline: none;
 }
 
 .chatBtn {
@@ -109,4 +135,81 @@ button:hover {
   border-radius: 6px;
   border: none;
   cursor: pointer;
+}
+
+#typingStatus {
+  font-style: italic;
+  font-size: 14px;
+  color: #ccc;
+}
+
+#userCount {
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #aaa;
+}
+
+#replyBox {
+  background: #222;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+.senderName {
+  font-size: 12px;
+  font-weight: bold;
+  color: #aaa;
+  margin-bottom: 2px;
+}
+
+.replyBox {
+  background-color: #222;
+  border-left: 3px solid #4caf50;
+  padding: 5px;
+  margin-bottom: 5px;
+  font-size: 13px;
+  color: #ccc;
+}
+
+.msg.you {
+  background-color: #3a3a3a;
+  align-self: flex-end;
+}
+
+.msg.other {
+  background-color: #1e1e1e;
+  align-self: flex-start;
+}
+
+.msg.system {
+  background-color: #000;
+  text-align: center;
+  font-style: italic;
+  color: #999;
+}
+
+.imgMsg {
+  max-width: 200px;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+#whatsNewBtn {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: #4caf50;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  z-index: 999;
+  font-size: 14px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+}
+
+#whatsNewBtn:hover {
+  background: #45a049;
 }
