@@ -18,7 +18,6 @@ let typingTimeout = null;
 let replyToMessage = null;
 let selectedFile = null;
 
-// Calculator unlock
 function press(val) {
   const display = document.getElementById("display");
   if (val === "C") {
@@ -41,9 +40,8 @@ function press(val) {
   }
 }
 
-// Join chat
 function unlockChat() {
-  nickname = prompt("Enter your nickname (e.g. Ghost💀):") || "Anon";
+  nickname = prompt("Enter your nickname:") || "Anon";
   nickname = nickname.trim().substring(0, 20);
 
   const userRef = db.ref(`rooms/${roomCode}/users/${nickname}`);
@@ -51,20 +49,20 @@ function unlockChat() {
   userRef.onDisconnect().remove();
 
   sendSystemMsg(`${nickname} joined the chat.`);
+
   window.addEventListener("beforeunload", () => {
     sendSystemMsg(`${nickname} left the chat.`);
   });
 
   document.getElementById("calculator").style.display = "none";
   document.getElementById("chatSection").style.display = "flex";
-  document.getElementById("whatsNewBtn").style.display = "inline-block";
+  document.getElementById("whatsNewBtn").style.display = "block";
 
   listenToMessages();
   listenTypingStatus();
   listenUserCount();
 }
 
-// System message
 function sendSystemMsg(text) {
   db.ref(`rooms/${roomCode}/chat`).push({
     text,
@@ -74,7 +72,6 @@ function sendSystemMsg(text) {
   });
 }
 
-// Send message
 function sendMsg() {
   const msgInput = document.getElementById("msgInput");
   const msg = msgInput.value.trim();
@@ -111,13 +108,11 @@ function sendMsg() {
   setTyping(false);
 }
 
-// Handle file
 function handleFileUpload(input) {
   selectedFile = input.files[0];
   if (selectedFile) sendMsg();
 }
 
-// Typing
 function setTyping(isTyping) {
   db.ref(`rooms/${roomCode}/typing/${nickname}`).set(isTyping);
   if (isTyping && typingTimeout) clearTimeout(typingTimeout);
@@ -128,17 +123,15 @@ function setTyping(isTyping) {
   }
 }
 
-// Listen typing
 function listenTypingStatus() {
   db.ref(`rooms/${roomCode}/typing`).on("value", snapshot => {
     const data = snapshot.val() || {};
     const typingNames = Object.keys(data).filter(name => name !== nickname && data[name]);
-    const typingText = typingNames.length > 0 ? `${typingNames.join(", ")} typing...` : "";
-    document.getElementById("typingStatus").textContent = typingText;
+    document.getElementById("typingStatus").textContent =
+      typingNames.length > 0 ? `${typingNames.join(", ")} typing...` : "";
   });
 }
 
-// Listen user count
 function listenUserCount() {
   db.ref(`rooms/${roomCode}/users`).on("value", snapshot => {
     const users = snapshot.val() || {};
@@ -146,7 +139,6 @@ function listenUserCount() {
   });
 }
 
-// Listen messages
 function listenToMessages() {
   const chatBox = document.getElementById("chatBox");
   db.ref("rooms/" + roomCode + "/chat").on("child_added", snapshot => {
@@ -156,22 +148,21 @@ function listenToMessages() {
     const div = document.createElement("div");
     div.className = "msg";
 
-    const senderName = document.createElement("div");
-    senderName.className = "senderName";
     if (msg.sender !== nickname && msg.sender !== "System") {
-      senderName.textContent = msg.sender;
-      div.appendChild(senderName);
+      const sender = document.createElement("div");
+      sender.className = "senderName";
+      sender.textContent = msg.sender;
+      div.appendChild(sender);
     }
 
     if (msg.reply) {
-      const replyBox = document.createElement("div");
-      replyBox.className = "replyBox";
-      replyBox.innerHTML = `<strong>${msg.reply.sender}:</strong> ${msg.reply.text}`;
-      div.appendChild(replyBox);
+      const reply = document.createElement("div");
+      reply.className = "replyBox";
+      reply.innerHTML = `<strong>${msg.reply.sender}:</strong> ${msg.reply.text}`;
+      div.appendChild(reply);
     }
 
     const content = document.createElement("div");
-    content.className = "msgContent";
 
     if (msg.type === "image") {
       const img = document.createElement("img");
@@ -179,11 +170,10 @@ function listenToMessages() {
       img.className = "imgMsg";
       content.appendChild(img);
     } else if (msg.type === "video") {
-      const video = document.createElement("video");
-      video.src = msg.text;
-      video.controls = true;
-      video.style.maxWidth = "100%";
-      content.appendChild(video);
+      const vid = document.createElement("video");
+      vid.src = msg.text;
+      vid.controls = true;
+      content.appendChild(vid);
     } else {
       content.textContent = msg.text;
     }
@@ -194,42 +184,26 @@ function listenToMessages() {
     else if (msg.sender === "System") div.classList.add("system");
     else div.classList.add("other");
 
-    // Swipe to reply (mobile)
-    let startX;
-    div.addEventListener("touchstart", e => {
-      startX = e.touches[0].clientX;
-    });
+    div.addEventListener("touchstart", e => (startX = e.touches[0].clientX));
     div.addEventListener("touchend", e => {
-      let endX = e.changedTouches[0].clientX;
-      if (startX - endX > 50 && msg.text) {
-        replyToMessage = {
-          sender: msg.sender,
-          text: msg.text
-        };
+      if (startX - e.changedTouches[0].clientX > 50) {
+        replyToMessage = { sender: msg.sender, text: msg.text };
         document.getElementById("replyToText").textContent = `Replying to ${msg.sender}: ${msg.text}`;
         document.getElementById("replyBox").style.display = "flex";
       }
     });
 
-    // Desktop click to reply
     div.addEventListener("click", () => {
-      if (msg.text) {
-        replyToMessage = {
-          sender: msg.sender,
-          text: msg.text
-        };
-        document.getElementById("replyToText").textContent = `Replying to ${msg.sender}: ${msg.text}`;
-        document.getElementById("replyBox").style.display = "flex";
-      }
+      replyToMessage = { sender: msg.sender, text: msg.text };
+      document.getElementById("replyToText").textContent = `Replying to ${msg.sender}: ${msg.text}`;
+      document.getElementById("replyBox").style.display = "flex";
     });
 
-    // Delete message on right click
     div.addEventListener("contextmenu", e => {
       e.preventDefault();
       if (msg.sender === nickname) {
-        const choice = confirm("Delete this message for everyone?");
-        if (choice) {
-          db.ref(`rooms/${roomCode}/chat/${id}`).remove();
+        if (confirm("Delete this message for everyone?")) {
+          db.ref("rooms/" + roomCode + "/chat/" + id).remove();
         }
       }
     });
@@ -237,16 +211,14 @@ function listenToMessages() {
     chatBox.appendChild(div);
     chatBox.scrollTop = chatBox.scrollHeight;
 
-    // Auto delete after 10 minutes (except system)
     if (msg.sender !== "System") {
       setTimeout(() => {
-        db.ref(`rooms/${roomCode}/chat/${id}`).remove();
+        db.ref("rooms/" + roomCode + "/chat/" + id).remove();
       }, 10 * 60 * 1000);
     }
   });
 }
 
-// Cancel reply
 function cancelReply() {
   replyToMessage = null;
   document.getElementById("replyBox").style.display = "none";
