@@ -18,7 +18,7 @@ let typingTimeout = null;
 let replyToMessage = null;
 let selectedFile = null;
 
-// CALCULATOR UI
+// Calculator unlock
 function press(val) {
   const display = document.getElementById("display");
   if (val === "C") {
@@ -41,7 +41,7 @@ function press(val) {
   }
 }
 
-// JOIN CHAT
+// Join chat
 function unlockChat() {
   nickname = prompt("Enter your nickname (e.g. Ghost💀):") || "Anon";
   nickname = nickname.trim().substring(0, 20);
@@ -50,45 +50,31 @@ function unlockChat() {
   userRef.set(true);
   userRef.onDisconnect().remove();
 
-  // Handle "left the chat" message properly
-  db.ref(`rooms/${roomCode}/chat`).push({
-    text: `${nickname} joined the chat.`,
-    sender: "System",
-    type: "system",
-    time: Date.now()
+  sendSystemMsg(`${nickname} joined the chat.`);
+  window.addEventListener("beforeunload", () => {
+    sendSystemMsg(`${nickname} left the chat.`);
   });
-
-  db.ref(`rooms/${roomCode}/disconnects/${nickname}`).onDisconnect().set(firebase.database.ServerValue.TIMESTAMP);
 
   document.getElementById("calculator").style.display = "none";
   document.getElementById("chatSection").style.display = "flex";
-
-  // Show "What's New" button
-  document.getElementById("whatsNewBtn").style.display = "block";
+  document.getElementById("whatsNewBtn").style.display = "inline-block";
 
   listenToMessages();
   listenTypingStatus();
   listenUserCount();
-  listenDisconnects();
 }
 
-// WATCH FOR USER DISCONNECTS
-function listenDisconnects() {
-  db.ref(`rooms/${roomCode}/disconnects`).on("child_added", snapshot => {
-    const name = snapshot.key;
-    if (name !== nickname) {
-      db.ref(`rooms/${roomCode}/chat`).push({
-        text: `${name} left the chat.`,
-        sender: "System",
-        type: "system",
-        time: Date.now()
-      });
-    }
-    db.ref(`rooms/${roomCode}/disconnects/${name}`).remove();
+// System message
+function sendSystemMsg(text) {
+  db.ref(`rooms/${roomCode}/chat`).push({
+    text,
+    sender: "System",
+    type: "system",
+    time: Date.now()
   });
 }
 
-// SEND MESSAGE
+// Send message
 function sendMsg() {
   const msgInput = document.getElementById("msgInput");
   const msg = msgInput.value.trim();
@@ -110,7 +96,7 @@ function sendMsg() {
     reader.onload = function (e) {
       message.type = selectedFile.type.startsWith("video") ? "video" : "image";
       message.text = e.target.result;
-      db.ref(`rooms/${roomCode}/chat`).push(message);
+      db.ref("rooms/" + roomCode + "/chat").push(message);
     };
     reader.readAsDataURL(selectedFile);
     selectedFile = null;
@@ -118,28 +104,31 @@ function sendMsg() {
   } else {
     message.type = "text";
     message.text = msg;
-    db.ref(`rooms/${roomCode}/chat`).push(message);
+    db.ref("rooms/" + roomCode + "/chat").push(message);
   }
 
   msgInput.value = "";
   setTyping(false);
 }
 
-// FILE UPLOAD
+// Handle file
 function handleFileUpload(input) {
   selectedFile = input.files[0];
   if (selectedFile) sendMsg();
 }
 
-// TYPING
+// Typing
 function setTyping(isTyping) {
   db.ref(`rooms/${roomCode}/typing/${nickname}`).set(isTyping);
   if (isTyping && typingTimeout) clearTimeout(typingTimeout);
   if (isTyping) {
-    typingTimeout = setTimeout(() => setTyping(false), 3000);
+    typingTimeout = setTimeout(() => {
+      setTyping(false);
+    }, 3000);
   }
 }
 
+// Listen typing
 function listenTypingStatus() {
   db.ref(`rooms/${roomCode}/typing`).on("value", snapshot => {
     const data = snapshot.val() || {};
@@ -149,7 +138,7 @@ function listenTypingStatus() {
   });
 }
 
-// ONLINE USERS
+// Listen user count
 function listenUserCount() {
   db.ref(`rooms/${roomCode}/users`).on("value", snapshot => {
     const users = snapshot.val() || {};
@@ -157,10 +146,10 @@ function listenUserCount() {
   });
 }
 
-// CHAT MESSAGES
+// Listen messages
 function listenToMessages() {
   const chatBox = document.getElementById("chatBox");
-  db.ref(`rooms/${roomCode}/chat`).on("child_added", snapshot => {
+  db.ref("rooms/" + roomCode + "/chat").on("child_added", snapshot => {
     const msg = snapshot.val();
     const id = snapshot.key;
 
@@ -193,6 +182,7 @@ function listenToMessages() {
       const video = document.createElement("video");
       video.src = msg.text;
       video.controls = true;
+      video.style.maxWidth = "100%";
       content.appendChild(video);
     } else {
       content.textContent = msg.text;
@@ -200,38 +190,40 @@ function listenToMessages() {
 
     div.appendChild(content);
 
-    // Class name
     if (msg.sender === nickname) div.classList.add("you");
     else if (msg.sender === "System") div.classList.add("system");
     else div.classList.add("other");
 
-    // Swipe-to-reply only for messages from others
-    if (msg.sender !== nickname && msg.text) {
-      let startX;
-      div.addEventListener("touchstart", e => {
-        startX = e.touches[0].clientX;
-      });
-
-      div.addEventListener("touchend", e => {
-        let endX = e.changedTouches[0].clientX;
-        if (startX - endX > 50) {
-          replyToMessage = { sender: msg.sender, text: msg.text };
-          document.getElementById("replyToText").textContent = `Replying to ${msg.sender}: ${msg.text}`;
-          document.getElementById("replyBox").style.display = "flex";
-        }
-      });
-    }
-
-    // Click to reply (desktop)
-    div.addEventListener("click", () => {
-      if (msg.text) {
-        replyToMessage = { sender: msg.sender, text: msg.text };
+    // Swipe to reply (mobile)
+    let startX;
+    div.addEventListener("touchstart", e => {
+      startX = e.touches[0].clientX;
+    });
+    div.addEventListener("touchend", e => {
+      let endX = e.changedTouches[0].clientX;
+      if (startX - endX > 50 && msg.text) {
+        replyToMessage = {
+          sender: msg.sender,
+          text: msg.text
+        };
         document.getElementById("replyToText").textContent = `Replying to ${msg.sender}: ${msg.text}`;
         document.getElementById("replyBox").style.display = "flex";
       }
     });
 
-    // Right-click to delete own messages
+    // Desktop click to reply
+    div.addEventListener("click", () => {
+      if (msg.text) {
+        replyToMessage = {
+          sender: msg.sender,
+          text: msg.text
+        };
+        document.getElementById("replyToText").textContent = `Replying to ${msg.sender}: ${msg.text}`;
+        document.getElementById("replyBox").style.display = "flex";
+      }
+    });
+
+    // Delete message on right click
     div.addEventListener("contextmenu", e => {
       e.preventDefault();
       if (msg.sender === nickname) {
@@ -245,7 +237,7 @@ function listenToMessages() {
     chatBox.appendChild(div);
     chatBox.scrollTop = chatBox.scrollHeight;
 
-    // Auto delete after 10 minutes
+    // Auto delete after 10 minutes (except system)
     if (msg.sender !== "System") {
       setTimeout(() => {
         db.ref(`rooms/${roomCode}/chat/${id}`).remove();
